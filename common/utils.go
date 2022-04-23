@@ -12,9 +12,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-
 type configuration struct {
-	DbUser, DbPwd, Database, DbHost      string
+	DbUser, DbPwd, Database, DbHost string
 }
 
 var ServiceConfig configuration
@@ -27,10 +26,9 @@ func initConfig() {
 }
 
 var (
-	Db         *gorm.DB
-	Log        *logrus.Logger
+	Db  *gorm.DB
+	Log *logrus.Logger
 )
-
 
 func createDb() {
 	if Db == nil {
@@ -73,4 +71,30 @@ func ParseUID(url string) (uint, error) {
 		return 0, nil
 	}
 	return uint(id), nil
+}
+
+func ParseTwoID(url string) (int, int, error) {
+	s := strings.Split(url, "/")
+	sub := s[len(s)-1]
+	if strings.Contains(sub, "&") {
+		s1 := strings.Split(sub, "&")
+		uid_S := s1[len(s1)-2]
+		uid, err := strconv.Atoi(uid_S)
+		if err != nil {
+			return 0, 0, nil
+		}
+		tid_S := s1[len(s1)-1]
+		tid, err := strconv.Atoi(tid_S)
+		if err != nil {
+			return 0, 0, nil
+		}
+		return uid, tid, nil
+	} else {
+		uid, err := strconv.Atoi(sub)
+		if err != nil {
+			return 0, 0, nil
+		}
+		return uid, 0, nil
+	}
+
 }

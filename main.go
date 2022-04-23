@@ -29,6 +29,6 @@ func main() {
 	if opts.Port != "" {
 		log.Panic(e.Start(":" + opts.Port))
 	} else {
-		log.Panic(e.Start(":8083"))
+		log.Panic(e.Start(":8080"))
 	}
 }

@@ -1,12 +1,11 @@
 package middleware
 
-
 import (
 	"net/http"
-	
+
 	"github.com/labstack/echo"
-	"gopkg.in/dgrijalva/jwt-go.v2"
 	"gitlab.com/vipindasvg/ticket-management/common"
+	"gopkg.in/dgrijalva/jwt-go.v2"
 )
 
 const (
@@ -82,11 +81,16 @@ func UserRBAC(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 		if token.Valid {
 			userdata := token.Claims["UserInfo"].(map[string]interface{})
+
 			tid := userdata["Id"] // user id from JWT
+
 			if userdata["IsAdmin"] == true {
+
 				return next(c)
 			} else {
-				id, err := common.ParseUID(c.Request().URL.Path)
+				//id, err := common.ParseUID(c.Request().URL.Path)
+				id, _, err := common.ParseTwoID(c.Request().URL.Path)
+				//				fmt.Println("tid from request body inside middleware ", t_id)
 				if err != nil {
 					return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 				}
