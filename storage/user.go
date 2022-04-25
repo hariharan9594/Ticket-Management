@@ -120,3 +120,21 @@ func (c *cursor) UpdateUserTicket(t *models.Ticket, tid, uid int) error {
 
 	return nil
 }
+
+//Delete ticket by id
+func (c *cursor) DeleteUserTicket(tid, uid int) error {
+	result := c.Db.Where("ticket_id = ? AND u_id =?", tid, uid).Delete(models.Ticket{})
+	if result.RowsAffected != 1 {
+		return fmt.Errorf("Access deinied.. You don't have permission to delete tickets created by other user..")
+	}
+	return nil
+}
+
+//Delete user by id
+func (c *cursor) DeleteUser(uid int) error {
+	result := c.Db.Where("id =?", uid).Delete(models.User{})
+	if result.RowsAffected != 1 {
+		return fmt.Errorf("Access deinied.. You don't have permission to delete tickets created by other user..")
+	}
+	return nil
+}

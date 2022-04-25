@@ -18,7 +18,6 @@ func CreateUser(c echo.Context) error {
 			Errorln("can not bind the request body into provided type:", err)
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	fmt.Println("Bind(u) :", u)
 	created, err := curs.CreateUser(u)
 	if err != nil {
 		common.Log.WithField("handler", "create-user").WithField("issue", "cursor").
@@ -48,14 +47,12 @@ func Login(c echo.Context) error {
 
 	// if login successful
 	// generate JWT token
-	fmt.Println("user.IsAdmin.Bool in login: ", user.IsAdmin.Bool)
 	token, err := common.GenerateJWT(user.Id, user.IsAdmin.Bool, user.UserName)
 	if err != nil {
 		common.Log.WithField("handler", "user-login").WithField("issue", "request").
 			Errorln("can not generate JWT token:", err)
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	fmt.Println("Login JWT token: ", token)
 	dto := struct {
 		User  models.User
 		Token string
@@ -79,10 +76,8 @@ func CreateTicket(c echo.Context) error {
 			Errorln("can not bind the request body into provided type:", err)
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-	fmt.Println("Bind(ticket) :", ticket)
 	id, err := common.ParseUID(c.Request().URL.Path)
 	//get id from link
-	fmt.Println("c.Request().URL.Path :", id)
 	//assign the id to ticket
 	ticket.U_id = int(id)
 	created, err := curs.CreateTicket(ticket)
@@ -191,4 +186,44 @@ func UpdateUserTicket(c echo.Context) error {
 	}
 	return c.JSON(http.StatusCreated, updated)
 
+}
+
+//Delete ticket
+func DeleteUserTicket(c echo.Context) error {
+	curs := storage.GetCursor()
+	uid, tid, err := common.ParseTwoID(c.Request().URL.Path)
+
+	if err != nil {
+		return err
+	}
+	err = curs.DeleteUserTicket(tid, uid)
+	if err != nil {
+		common.Log.WithField("handler", "Delete-tickets").WithField("issue", "cursor").
+			Errorln("cannot Delete ticket record in the database:", err)
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	common.Log.Debugf("Successfully Deleted...")
+	updated := map[string]string{
+		"message": "successfully Deleted...",
+	}
+	return c.JSON(http.StatusCreated, updated)
+}
+
+func DeleteUser(c echo.Context) error {
+	curs := storage.GetCursor()
+	uid, _, err := common.ParseTwoID(c.Request().URL.Path)
+	if err != nil {
+		return err
+	}
+	err = curs.DeleteUser(uid)
+	if err != nil {
+		common.Log.WithField("handler", "Delete-User").WithField("issue", "cursor").
+			Errorln("cannot Delete User in the database:", err)
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	common.Log.Debugf("User hasbeen Successfully Removed...")
+	updated := map[string]string{
+		"message": "User hasbeen Successfully Removed...",
+	}
+	return c.JSON(http.StatusCreated, updated)
 }

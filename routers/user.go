@@ -19,6 +19,9 @@ func SetUserRoutes(e *echo.Echo) *echo.Echo {
 	e.GET(versionpref+"/User/singleTicket/:id", controllers.UserTicketDetail, middleware.UserRBAC)
 	//Update method
 	e.PUT(versionpref+"/User/updateTicket/:tid", controllers.UpdateUserTicket, middleware.UserRBAC)
+	//Delete method
+	e.DELETE(versionpref+"/User/DeleteTicket/:tid", controllers.DeleteUserTicket, middleware.UserRBAC)
+	e.DELETE(versionpref+"/User/DeleteUser/:id", controllers.DeleteUser, middleware.AdminRBAC)
 
 	return e
 }
