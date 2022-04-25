@@ -225,5 +225,6 @@ func DeleteUser(c echo.Context) error {
 	updated := map[string]string{
 		"message": "User hasbeen Successfully Removed...",
 	}
+	//Demo
 	return c.JSON(http.StatusCreated, updated)
 }
